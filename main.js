@@ -1,7 +1,6 @@
 import {Pane} from 'tweakpane';
 import {Matrix} from 'ml-matrix';
 
-
 const pane = new Pane({
     title: 'Parameters',
     expanded: true,
@@ -21,3 +20,12 @@ pane.addBinding(PARAMS, 'export', {
 const matrix = Matrix.ones(5, 5);
 
 console.log(matrix.to2DArray());
+
+window.setup = () => {
+    createCanvas(512, 384);
+};
+
+window.draw = () => {
+    background(100);
+
+};
