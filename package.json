@@ -13,9 +13,8 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
-    "@types/p5": "^1.6.2",
     "ml-matrix": "^6.10.4",
-    "p5": "^1.7.0",
+    "pixi.js": "^7.2.4",
     "tweakpane": "^4.0.0"
   }
 }
