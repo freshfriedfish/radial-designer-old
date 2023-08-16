@@ -1,6 +1,6 @@
 import {Pane} from 'tweakpane';
 import {Matrix} from 'ml-matrix';
-import * as PIXI from 'pixi.js';
+
 
 const pane = new Pane({
     title: 'Parameters',
@@ -21,11 +21,3 @@ pane.addBinding(PARAMS, 'export', {
 const matrix = Matrix.ones(5, 5);
 
 console.log(matrix.to2DArray());
-
-const app = new PIXI.Application({
-    background: '#1099bb',
-    height: 600,
-    width: 600,
-}); //512, 384
-
-document.body.appendChild(app.view);
