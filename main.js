@@ -1,6 +1,5 @@
 import {Pane} from 'tweakpane';
-import {Matrix, MatrixColumnView} from 'ml-matrix';
-import {ManualTicker} from "@tweakpane/core";
+import {Matrix} from 'ml-matrix';
 
 //example shapes
 
@@ -15,7 +14,7 @@ const PARAMS = {copies: 3, rotate_single: 0, rotate_all: 0, dist: 0, center: fal
 
 pane.addBinding(PARAMS, 'copies', {step: 1, min: 3, max: 10,});
 pane.addBinding(PARAMS, 'rotate_single', {step: 1, min: -180, max: 180,});
-pane.addBinding(PARAMS, 'rotate_all', {step: 1, min: -180, max: 180,});
+pane.addBinding(PARAMS, 'rotate_all', {step: .1, min: -180, max: 180,});
 pane.addBinding(PARAMS, 'dist', {step: 1, min: 0, max: 300,});
 pane.addBinding(PARAMS, 'center')
 pane.addBinding(PARAMS, 'export', {
@@ -30,8 +29,8 @@ console.log("150, 122, 238, 38, 332, 125");
 console.log(bezCurve.to2DArray(), bezCurve.to1DArray());
 console.log("150, 122, 189, 52, 378, 53, 420, 130");
 //PARAMS.export = straight.to2DArray();
-
-let emptymat = new Matrix([[0], [0],]);
+//
+// let emptymat = new Matrix([[0], [0],]);
 // console.log(emptymat.to2DArray());
 // emptymat.addColumn(0, [10, 10]);
 // console.log(emptymat.to2DArray());
@@ -81,12 +80,13 @@ function drawCurveSingleMatrix(matrix) {
 //---------------------------------------------------------------------------------------------------
 
 window.setup = () => {
-    createCanvas(windowWidth, windowHeight);
+    createCanvas(windowWidth-100, windowHeight-100);
     strokeWeight(20);
     rectMode(CENTER);
     noFill();
 };
 window.draw = () => {
+    translate(200, 200);
     background(100);
     rect(256, 192, 512, 384);
     let newmatrix = bezCurve.clone();
@@ -98,7 +98,13 @@ window.draw = () => {
     if (PARAMS.center === true) newmatrix.add(tempmat); //center
     newmatrix.add(PARAMS.dist); //dist
 
-
+    const rotationMat = new Matrix([
+        [Math.cos(PARAMS.rotate_all), -Math.sin(PARAMS.rotate_all)],
+        [Math.sin(PARAMS.rotate_all), Math.cos(PARAMS.rotate_all)],
+    ]);
+    // newmatrix.add(252)
+    newmatrix = rotationMat.mmul(newmatrix);
+    // newmatrix.sub(252)
     drawCurveSingleMatrix(newmatrix);
     push(); //text of head
     fill(0);
