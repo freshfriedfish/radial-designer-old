@@ -22,18 +22,19 @@ pane.addBinding(PARAMS, 'export', {
 });
 
 window.setup = () => {
-    createCanvas(windowWidth - 100, windowHeight - 100);
-    strokeWeight(20);
-    stroke(0, 100);
+    createCanvas(windowWidth, windowHeight);
+    fill("rgba(0, 0, 0, 0)")
     rectMode(CENTER);
-    noFill();
+
 };
 window.draw = () => {
+    scale(2);
+    //translate(width/8,height/16);
     background(100);
     rect(256, 192, 512, 384);
     translate(256, 192);
     const rotateAll = new Matrix([[Math.cos(degToRad(PARAMS.rotate_all)), -Math.sin(degToRad(PARAMS.rotate_all))], [Math.sin(degToRad(PARAMS.rotate_all)), Math.cos(degToRad(PARAMS.rotate_all))],]);
-    const rotateSingMat = new Matrix([[Math.cos(degToRad(PARAMS.rotate_single)), -Math.sin(degToRad(PARAMS.rotate_single))], [Math.sin(degToRad(PARAMS.rotate_single)), Math.cos(degToRad(PARAMS.rotate_single))],]);
+    const rotateSingle = new Matrix([[Math.cos(degToRad(PARAMS.rotate_single)), -Math.sin(degToRad(PARAMS.rotate_single))], [Math.sin(degToRad(PARAMS.rotate_single)), Math.cos(degToRad(PARAMS.rotate_single))],]);
 
     let newmatrix = bezCurve.clone(); //what is newmatrix??
     const tempcol = bezCurve.getColumn(0);
@@ -42,47 +43,40 @@ window.draw = () => {
         tempmat.addColumn(0, [0 - tempcol[0], 0 - tempcol[1]]);
     }
     if (PARAMS.center === true) newmatrix.add(tempmat); //centerize
-    newmatrix.add(PARAMS.dist); //dist
 
+    newmatrix = rotateSingle.mmul(newmatrix);
+    newmatrix.add(PARAMS.dist); //dist
     newmatrix = rotateAll.mmul(newmatrix);
 
     let otherMatrices = newmatrix.clone(); //??
 
-    let allMatArr = [newmatrix.clone()];
+    const allMatArr = [newmatrix.clone()];
     const centralAngle = 360 / PARAMS.copies;
     const copyRotate = new Matrix([[Math.cos(degToRad(centralAngle)), -Math.sin(degToRad(centralAngle))], [Math.sin(degToRad(centralAngle)), Math.cos(degToRad(centralAngle))],]);
 
     for (let i = 0; i < PARAMS.copies; i++) {
         otherMatrices = copyRotate.mmul(otherMatrices)
+
+
         allMatArr.push(otherMatrices)
-        drawCurveSingleMatrix(otherMatrices);
+        drawCurveSingleMatrixHelper(otherMatrices);
 
         //PARAMS.export = PARAMS.export +'\n'+ JSON.stringify(otherMatrices.to1DArray());
         //console.log(JSON.stringify(otherMatrices.to1DArray()));
     }
-    /*
-    dont rotate and draw othermatrices same time
-    get interior angle then in a for loop rotate by that then draw it
-        - prob need to edit the formula being used (2*pi/copies*i)
-        - push every matrix in this for loop to an array (this will be used for export)
-
-    ((n-2)*180)/n
-
-    360/n*i
-     */
-    push(); //text of head
-    fill(0);
-    textSize(32)
-    text(newmatrix.getColumn(0), 50, 100);
-    pop();
-
     newmatrix.round();
+
     PARAMS.export = newmatrix.to1DArray() + '\n' + 'hello';
 
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-function drawCurveSingleMatrix(matrix) {
+function drawCurveSingleMatrix(matrix){
+
+
+}
+
+function drawCurveSingleMatrixHelper(matrix) {
     const marr = matrix.to2DArray();
     beginShape();
     vertex(marr[0][0], marr[1][0]);
