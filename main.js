@@ -48,10 +48,6 @@ console.log("150, 122, 189, 52, 378, 53, 420, 130");
 // }
 // console.log(tempmat.to2DArray());
 
-function toAboutZero() {
-
-}
-
 function drawLine(arr) {
     beginShape();
     vertex(arr[0][0], arr[1][0]);
