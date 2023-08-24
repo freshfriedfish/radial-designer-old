@@ -16,24 +16,47 @@ const bezCurve = new Matrix([
 ]);
 /*
 TODO:
-    - add support for complex slidershapes (nested matrices)
+    - add support for complex slidershapes,
     - add .osu parsing
  */
 
 const pane = new Pane({
     title: 'radial-designer', expanded: true,
 });
-const PARAMS = {size: 4, copies: 3, rotate_single: 0, rotate_all: 0, dist: 0, center: true, export: ""};
+const PARAMS = {size: 4, copies: 3, rotate_single: 0, rotate_all: 0, dist: 0, center: true,
+    importType: '', importObj:'', export: ''};
 
-pane.addBinding(PARAMS, 'size', {step: 1, min: 1, max: 50,});
-pane.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 9,});
-pane.addBinding(PARAMS, 'rotate_single', {step: 1, min: -180, max: 180,});
-pane.addBinding(PARAMS, 'rotate_all', {step: 1, min: -180, max: 180,});
-pane.addBinding(PARAMS, 'dist', {step: 1, min: 0, max: 300,});
-pane.addBinding(PARAMS, 'center')
-pane.addBinding(PARAMS, 'export', {
-    readonly: true, multiline: true, rows: 20, label: null
-});
+((folder) => {
+    folder.addBinding(PARAMS, 'size', {step: 1, min: 1, max: 50,});
+    folder.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 9,});
+    folder.addBinding(PARAMS, 'rotate_all', {step: 5, min: -180, max: 180, label: 'main rotate'});
+    folder.addBinding(PARAMS, 'rotate_single', {step: 5, min: -180, max: 180, label: 'sub rotate'});
+    folder.addBinding(PARAMS, 'dist', {step: 5, min: 0, max: 300,label: 'distance'});
+    folder.addBinding(PARAMS, 'center', {label: 'center object'})
+})(pane.addFolder({
+    title: 'parameters',
+}));
+((folder) => {
+
+    folder.addBinding(PARAMS, 'importType',{
+        options:{
+            choose: '',
+            svg: 'SVG',
+            osu: 'OSU',
+        }, label: 'import/export type',
+    })
+    folder.addBinding(PARAMS, 'importObj',{
+        label:'import paste'
+    })
+    folder.addBinding(PARAMS, 'export', {
+        readonly: true, multiline: true, rows: 20, label: null
+    });
+    folder.addBlade({
+        view: 'separator',
+    });
+})(pane.addFolder({
+    title:'import/export',
+}));
 
 window.setup = () => {
     createCanvas(windowWidth, windowHeight);
