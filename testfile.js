@@ -28,7 +28,7 @@ const pane = new Pane({
     title: 'radial-designer', expanded: true,
 });
 const PARAMS = {
-    welcome:'Welcome to radial-designer! Import your .osu slider code,\nor choose from a preset slider to get started  ',
+    welcome:'Welcome to radial-designer! Import your .osu slider code,\nor choose from a preset to get started',
     size: 50, copies: 3, rotate_single: 0, rotate_all: 0, dist: 50, center: true,
     importType: '', importObj: '', export: ''
 };
@@ -41,8 +41,8 @@ pane.addBinding(PARAMS, 'welcome', {
 
 ((folder) => {
     //folder.addBinding(PARAMS, 'size', {step: 1, min: 1, max: 50,});
-    folder.addBinding(PARAMS, 'dist', {step: 5, min: 0, max: 300, label: 'distance'});
-    folder.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 9,});
+    folder.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 11,});
+    folder.addBinding(PARAMS, 'dist', {step: 5, min: -200, max: 200, label: 'distance'});
     folder.addBinding(PARAMS, 'rotate_all', {step: 5, min: -180, max: 180, label: 'main rotate'});
     folder.addBinding(PARAMS, 'rotate_single', {step: 5, min: -180, max: 180, label: 'sub rotate'});
     folder.addBinding(PARAMS, 'size', {step: 5, min: 25, max: 75,});
@@ -56,7 +56,7 @@ pane.addBinding(PARAMS, 'welcome', {
             choose: 'CHOOSE',
             straight: 'STRAIGHT',
             curve: 'CURVE',
-        }, label: 'import/export type',
+        }, label: 'import presets',
     })
     folder.addBinding(PARAMS, 'importObj', {
         label: 'import paste'
@@ -121,10 +121,10 @@ window.draw = () => {
         drawCurveSingleMatrixHelper(otherMatrices);
         stroke(255, );
         strokeWeight(PARAMS.size);
-        circle(headparams[0], headparams[1], 5)
+        circle(headparams[0], headparams[1], 1)
         stroke(10, 83, 143, );
         strokeWeight(PARAMS.size-5);
-        circle(headparams[0], headparams[1], 5)
+        circle(headparams[0], headparams[1], 1)
 
         pop();
 
