@@ -30,14 +30,14 @@ pane.addBinding(IO, 'importType', {
     //list of options
     switch (ev.value) {
         case 'default':
-            testText.hidden = false;
+            buttontest.hidden = false;
             break;
         case 'line':
-            testText.hidden = true;
+            buttontest.hidden = true;
             pickedObj = straight;
             break;
         case 'curve':
-            testText.hidden = true;
+            buttontest.hidden = true;
             pickedObj = quadCurve;
             break;
 
@@ -45,18 +45,10 @@ pane.addBinding(IO, 'importType', {
     console.log(ev.value);
     //console.log(pickedObj.toString());
 });
-
-const testText = pane.addBlade({
-    view: 'text',
-    label: 'name',
-    value: 'bruh',
-    parse: (v) => String(v),
-    hidden: true,
-
-})
 let file = null;
-pane.addButton({
-    title: 'Upload file'
+const buttontest = pane.addButton({
+    title: 'Upload file',
+    hidden: true,
 }).on('click', () => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
@@ -70,3 +62,12 @@ pane.addButton({
     input.click();
 })
 
+
+const testText = pane.addBlade({
+    view: 'text',
+    label: 'name',
+    value: 'bruh',
+    parse: (v) => String(v),
+    hidden: true,
+
+})
