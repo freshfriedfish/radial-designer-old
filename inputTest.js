@@ -60,14 +60,6 @@ const buttontest = pane.addButton({
         document.body.removeChild(input);
     }, { once: true })
     input.click();
-})
+});
 
-
-const testText = pane.addBlade({
-    view: 'text',
-    label: 'name',
-    value: 'bruh',
-    parse: (v) => String(v),
-    hidden: true,
-
-})
+//230,238,8569,2,0,P|281:167|305:244,1,200
