@@ -1,7 +1,7 @@
 import {Pane} from 'tweakpane';
 import {Matrix} from 'ml-matrix';
 
-//example shapes
+//test shapes
 const straight = new Matrix([
     [141, 331],
     [233, 216],
@@ -27,9 +27,10 @@ TODO:
 const pane = new Pane({
     title: 'radial-designer', expanded: true,
 });
+
 const PARAMS = {
     welcome:'Welcome to radial-designer! Import your .osu slider code,\nor choose from a preset to get started',
-    size: 50, copies: 3, rotate_single: 0, rotate_all: 0, dist: 50, center: true,
+    size: 50, copies: 3, rotate_single: 0, rotate_all: 0, dist: -50, center: true,
     importType: '', importObj: '', export: ''
 };
 
@@ -41,10 +42,10 @@ pane.addBinding(PARAMS, 'welcome', {
 
 ((folder) => {
     //folder.addBinding(PARAMS, 'size', {step: 1, min: 1, max: 50,});
-    folder.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 11,});
+    folder.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 12,});
     folder.addBinding(PARAMS, 'dist', {step: 5, min: -200, max: 200, label: 'distance'});
-    folder.addBinding(PARAMS, 'rotate_all', {step: 5, min: -180, max: 180, label: 'main rotate'});
-    folder.addBinding(PARAMS, 'rotate_single', {step: 5, min: -180, max: 180, label: 'sub rotate'});
+    folder.addBinding(PARAMS, 'rotate_single', {step: 5, min: -180, max: 180, label: 'fine rotation'});
+    folder.addBinding(PARAMS, 'rotate_all', {step: 5, min: -180, max: 180, label: 'rotation'});
     folder.addBinding(PARAMS, 'size', {step: 5, min: 25, max: 75,});
     folder.addBinding(PARAMS, 'center', {label: 'center object'})
 })(pane.addFolder({
@@ -61,12 +62,12 @@ pane.addBinding(PARAMS, 'welcome', {
     folder.addBinding(PARAMS, 'importObj', {
         label: 'import paste'
     })
-    folder.addBlade({
-        view: 'separator',
-    });
     folder.addBinding(PARAMS, 'export', {
         readonly: true, multiline: true, rows: 8, label: null
     });
+    folder.addButton({
+        title: 'capture image',
+    })
 
 })(pane.addFolder({
     title: 'import/export',
@@ -88,10 +89,10 @@ window.draw = () => {
     const rotateAll = new Matrix([[Math.cos(degToRad(PARAMS.rotate_all)), -Math.sin(degToRad(PARAMS.rotate_all))], [Math.sin(degToRad(PARAMS.rotate_all)), Math.cos(degToRad(PARAMS.rotate_all))],]);
     const rotateSingle = new Matrix([[Math.cos(degToRad(PARAMS.rotate_single)), -Math.sin(degToRad(PARAMS.rotate_single))], [Math.sin(degToRad(PARAMS.rotate_single)), Math.cos(degToRad(PARAMS.rotate_single))],]);
 
-    let newmatrix = multistraight.clone(); //what is newmatrix??
-    const tempcol = multistraight.getColumn(0);
+    let newmatrix = quadCurve.clone(); //what is newmatrix??
+    const tempcol = newmatrix.getColumn(0);
     const tempmat = new Matrix([[0 - tempcol[0]], [0 - tempcol[1]]]);
-    for (let i = 0; i < multistraight.columns - 1; i++) {
+    for (let i = 0; i < newmatrix.columns - 1; i++) {
         tempmat.addColumn(0, [0 - tempcol[0], 0 - tempcol[1]]);
     }
     if (PARAMS.center === true) newmatrix.add(tempmat); //centerize
@@ -113,18 +114,18 @@ window.draw = () => {
         //slider drawing
         const headparams = otherMatrices.getColumn(0);
         push();
-        stroke(255, );
+        stroke(255, 100);
         strokeWeight(PARAMS.size);
         drawCurveSingleMatrixHelper(otherMatrices);
-        stroke(10, 83, 143, );
+        stroke(10, 83, 143, 100);
         strokeWeight(PARAMS.size-5);
         drawCurveSingleMatrixHelper(otherMatrices);
-        stroke(255, );
-        strokeWeight(PARAMS.size);
-        circle(headparams[0], headparams[1], 1)
-        stroke(10, 83, 143, );
-        strokeWeight(PARAMS.size-5);
-        circle(headparams[0], headparams[1], 1)
+        // stroke(255, );
+        // strokeWeight(PARAMS.size);
+        // circle(headparams[0], headparams[1], 1)
+        // stroke(10, 83, 143, );
+        // strokeWeight(PARAMS.size-5);
+        // circle(headparams[0], headparams[1], 1)
 
         pop();
 
