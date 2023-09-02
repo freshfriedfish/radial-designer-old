@@ -1,6 +1,6 @@
 import {Pane} from 'tweakpane';
 import {Matrix} from 'ml-matrix';
-
+import { BeatmapDecoder } from 'osu-parsers'
 
 let pickedObj;
 const straight = new Matrix([
@@ -58,8 +58,19 @@ const buttontest = pane.addButton({
     input.addEventListener('input', (ev) => {
         file = input.files[0];
         document.body.removeChild(input);
+        console.log(file);
     }, { once: true })
     input.click();
+
 });
+const decoder = new BeatmapDecoder();
+const beatmap1 = await decoder.decodeFromPath(file, true);
+console.log(file);
+console.log(beatmap1);
+
+window.draw = async () => {
+
+
+};
 
 //230,238,8569,2,0,P|281:167|305:244,1,200

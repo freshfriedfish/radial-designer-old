@@ -19,6 +19,12 @@ const multistraight = new Matrix([
     [192, 232, 232, 264, 264, 332],
     [152, 152, 152, 208, 208, 208],
 ]);
+
+const arcTest = new Matrix([
+    [109,89 ,72 ,60 ,49 ,43 ,45 ,47 ,57,71,86,105,126,146,167,184,201,214,220,226,225,217,209,195,177],
+    [216,210,198,180,163,142,122,101,82,67,53,43 ,41 ,39 ,45 ,56 ,67 ,85 ,104,124,146,165,184,200,209],
+])
+
 /*
 TODO:
     - add .osu parsing
@@ -37,8 +43,6 @@ const PARAMS = {
 pane.addBinding(PARAMS, 'welcome', {
     readonly: true, multiline: true, rows: 2, label: null,
 });
-
-
 
 ((folder) => {
     //folder.addBinding(PARAMS, 'size', {step: 1, min: 1, max: 50,});
@@ -188,7 +192,6 @@ function drawCurveSingleMatrixHelper2(matrix){
     endShape();
     //rect(marr[0][0], marr[1][0], 10);
 }
-
 
 function degToRad(degrees) {
     return degrees * (Math.PI / 180);
