@@ -1,5 +1,7 @@
 import {Pane} from 'tweakpane';
 import {Matrix} from 'ml-matrix';
+import textfile from "/filetemplate.osu?raw";
+import {BeatmapDecoder} from "osu-parsers";
 
 //test shapes
 const straight = new Matrix([
@@ -29,9 +31,33 @@ const arcTest = new Matrix([
 TODO:
     - add .osu parsing
  */
+//file decoding
+const beatmap1 = new BeatmapDecoder().decodeFromString(textfile, true);
+const finalObj = beatmap1.hitObjects[beatmap1.hitObjects.length - 1];
+const emptyMat = new Matrix([
+    [],
+    [],
+]);
 
+const newerarr = [];
+finalObj.path.controlPoints.forEach(pathpoint => {
+    const ifdupe = pathpoint.type;
+    if (ifdupe != null) {
+        newerarr.push(pathpoint.position.toString().split(','), pathpoint.position.toString().split(','));
+    } else {
+        newerarr.push(pathpoint.position.toString().split(','));
+    }
+});
+newerarr.shift();
+// console.log(finalObj.path.controlPoints);
+// console.log(newerarr);
+
+newerarr.forEach((ele) => emptyMat.addColumn(ele));
+emptyMat.addColumnVector(finalObj.startPosition.toString().split(',').map(Number))
+
+//pane
 const pane = new Pane({
-    title: 'radial-designer', expanded: true,
+    title: 'radial-designer', expanded: false,
 });
 
 const PARAMS = {
@@ -49,7 +75,7 @@ pane.addBinding(PARAMS, 'welcome', {
     folder.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 12,});
     folder.addBinding(PARAMS, 'dist', {step: 5, min: -200, max: 200, label: 'distance'});
     folder.addBinding(PARAMS, 'rotate_single', {step: 5, min: -180, max: 180, label: 'fine rotation'});
-    folder.addBinding(PARAMS, 'rotate_all', {step: 5, min: -180, max: 180, label: 'rotation'});
+    folder.addBinding(PARAMS, 'rotate_all', {step: 5, min: -180, max: 180, label: 'full rotation'});
     folder.addBinding(PARAMS, 'size', {step: 5, min: 25, max: 75,});
     folder.addBinding(PARAMS, 'center', {label: 'center object'})
 })(pane.addFolder({
@@ -93,7 +119,7 @@ window.draw = () => {
     const rotateAll = new Matrix([[Math.cos(degToRad(PARAMS.rotate_all)), -Math.sin(degToRad(PARAMS.rotate_all))], [Math.sin(degToRad(PARAMS.rotate_all)), Math.cos(degToRad(PARAMS.rotate_all))],]);
     const rotateSingle = new Matrix([[Math.cos(degToRad(PARAMS.rotate_single)), -Math.sin(degToRad(PARAMS.rotate_single))], [Math.sin(degToRad(PARAMS.rotate_single)), Math.cos(degToRad(PARAMS.rotate_single))],]);
 
-    let newmatrix = quadCurve.clone(); //what is newmatrix??
+    let newmatrix = emptyMat.clone(); //what is newmatrix??
     const tempcol = newmatrix.getColumn(0);
     const tempmat = new Matrix([[0 - tempcol[0]], [0 - tempcol[1]]]);
     for (let i = 0; i < newmatrix.columns - 1; i++) {
@@ -124,12 +150,13 @@ window.draw = () => {
         stroke(10, 83, 143, 100);
         strokeWeight(PARAMS.size-5);
         drawCurveSingleMatrixHelper(otherMatrices);
-        // stroke(255, );
-        // strokeWeight(PARAMS.size);
-        // circle(headparams[0], headparams[1], 1)
-        // stroke(10, 83, 143, );
-        // strokeWeight(PARAMS.size-5);
-        // circle(headparams[0], headparams[1], 1)
+        blendMode(BLEND)
+        stroke(255, 100);
+        strokeWeight(PARAMS.size);
+        circle(headparams[0], headparams[1], 1)
+        stroke(10, 83, 143, 100);
+        strokeWeight(PARAMS.size-5);
+        circle(headparams[0], headparams[1], 1)
 
         pop();
 
@@ -166,18 +193,19 @@ function drawCurveSingleMatrixHelper(matrix) {
     }
     temp.addColumn(temp.columns - 1, matCopy.getColumnVector(matCopy.columns - 1))
     grouped.push(temp);
-
+    beginShape();
     grouped.forEach((element) => {
         element.flipRows();
         element.removeColumn(0);
-        element.flipRows();
+        beginShape();
         drawCurveSingleMatrixHelper2(element);
     });
+    endShape();
 }
 
 function drawCurveSingleMatrixHelper2(matrix){
     const marr = matrix.to2DArray();
-    beginShape();
+    // beginShape();
     vertex(marr[0][0], marr[1][0]);
     switch (marr[0].length) {
         case 2:
@@ -189,7 +217,7 @@ function drawCurveSingleMatrixHelper2(matrix){
         case 4:
             bezierVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2], marr[0][3], marr[1][3],)
     }
-    endShape();
+    // endShape();
     //rect(marr[0][0], marr[1][0], 10);
 }
 
