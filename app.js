@@ -73,10 +73,10 @@ pane.addBinding(PARAMS, 'welcome', {
 ((folder) => {
     //folder.addBinding(PARAMS, 'size', {step: 1, min: 1, max: 50,});
     folder.addBinding(PARAMS, 'copies', {step: 1, min: 1, max: 12,});
-    folder.addBinding(PARAMS, 'dist', {step: 5, min: -200, max: 200, label: 'distance'});
-    folder.addBinding(PARAMS, 'rotate_single', {step: 5, min: -180, max: 180, label: 'fine rotation'});
-    folder.addBinding(PARAMS, 'rotate_all', {step: 5, min: -180, max: 180, label: 'full rotation'});
-    folder.addBinding(PARAMS, 'size', {step: 5, min: 25, max: 75,});
+    folder.addBinding(PARAMS, 'dist', {step: 1, min: -300, max: 300, label: 'distance'});
+    folder.addBinding(PARAMS, 'rotate_single', {step: 1, min: -180, max: 180, label: 'fine rotation'});
+    folder.addBinding(PARAMS, 'rotate_all', {step: 1, min: -180, max: 180, label: 'full rotation'});
+    folder.addBinding(PARAMS, 'size', {step: 1, min: 25, max: 75,});
     folder.addBinding(PARAMS, 'center', {label: 'center object'})
 })(pane.addFolder({
     title: 'parameters',
@@ -107,6 +107,8 @@ window.setup = () => {
     createCanvas(windowWidth, windowHeight);
     fill("rgba(0, 0, 0, 0)")
     rectMode(CENTER);
+    strokeCap(ROUND);
+    strokeJoin(ROUND);
 };
 window.draw = () => {
     translate(width / 2, height / 2);
@@ -146,18 +148,17 @@ window.draw = () => {
         push();
         stroke(255, 100);
         strokeWeight(PARAMS.size);
-        drawCurveSingleMatrixHelper(otherMatrices);
+        drawCurveSingleMatrix(otherMatrices);
         stroke(10, 83, 143, 100);
         strokeWeight(PARAMS.size-5);
-        drawCurveSingleMatrixHelper(otherMatrices);
-        blendMode(BLEND)
+        drawCurveSingleMatrix(otherMatrices);
+        //head drawing
         stroke(255, 100);
         strokeWeight(PARAMS.size);
         circle(headparams[0], headparams[1], 1)
         stroke(10, 83, 143, 100);
         strokeWeight(PARAMS.size-5);
         circle(headparams[0], headparams[1], 1)
-
         pop();
 
 
@@ -172,7 +173,7 @@ window.draw = () => {
 
 };
 //----------------------------------------------------------------------------------------------------------------------
-function drawCurveSingleMatrixHelper(matrix) {
+function drawCurveSingleMatrix(matrix) {
     const matCopy = matrix.clone();
     const grouped = []
     let curr = matCopy.getColumnVector(0);
@@ -193,34 +194,31 @@ function drawCurveSingleMatrixHelper(matrix) {
     }
     temp.addColumn(temp.columns - 1, matCopy.getColumnVector(matCopy.columns - 1))
     grouped.push(temp);
-    beginShape();
     grouped.forEach((element) => {
         element.flipRows();
         element.removeColumn(0);
-        beginShape();
-        drawCurveSingleMatrixHelper2(element);
+        element.flipRows();
     });
+    beginShape();
+    for (let i = 0;i<grouped.length;i++) {
+        const marr = grouped[i].to2DArray();
+        switch (marr[0].length) {
+            case 2:
+                vertex(marr[0][0], marr[1][0]);
+                vertex(marr[0][1], marr[1][1]);
+                break;
+            case 3:
+                vertex(marr[0][0], marr[1][0]);
+                quadraticVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2],)
+                break;
+            case 4:
+                vertex(marr[0][0], marr[1][0]);
+                bezierVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2], marr[0][3], marr[1][3],)
+        }
+        //rect(marr[0][0], marr[1][0], 10);
+    }
     endShape();
 }
-
-function drawCurveSingleMatrixHelper2(matrix){
-    const marr = matrix.to2DArray();
-    // beginShape();
-    vertex(marr[0][0], marr[1][0]);
-    switch (marr[0].length) {
-        case 2:
-            vertex(marr[0][1], marr[1][1]);
-            break;
-        case 3:
-            quadraticVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2],)
-            break;
-        case 4:
-            bezierVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2], marr[0][3], marr[1][3],)
-    }
-    // endShape();
-    //rect(marr[0][0], marr[1][0], 10);
-}
-
 function degToRad(degrees) {
     return degrees * (Math.PI / 180);
 }
