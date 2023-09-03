@@ -1,6 +1,5 @@
 import {Pane} from 'tweakpane';
 import {Matrix} from 'ml-matrix';
-import textfile from "/filetemplate.osu?raw";
 import {BeatmapDecoder} from "osu-parsers";
 
 //test shapes
@@ -12,44 +11,11 @@ const quadCurve = new Matrix([
     [150, 238, 332],
     [122, 38, 125],
 ]);
-const bezCurve = new Matrix([
-    [150, 189, 378, 420],
-    [122, 52, 53, 130],
-]);
 
-const multistraight = new Matrix([
-    [192, 232, 232, 264, 264, 332],
-    [152, 152, 152, 208, 208, 208],
-]);
-
-const arcTest = new Matrix([
-    [109,89 ,72 ,60 ,49 ,43 ,45 ,47 ,57,71,86,105,126,146,167,184,201,214,220,226,225,217,209,195,177],
-    [216,210,198,180,163,142,122,101,82,67,53,43 ,41 ,39 ,45 ,56 ,67 ,85 ,104,124,146,165,184,200,209],
-])
+let parsedMat;
 
 //file decoding
-const beatmap1 = new BeatmapDecoder().decodeFromString(textfile, true);
-const finalObj = beatmap1.hitObjects[beatmap1.hitObjects.length - 1];
-const parsedMat = new Matrix([
-    [],
-    [],
-]);
 
-const newerarr = [];
-finalObj.path.controlPoints.forEach(pathpoint => {
-    const ifdupe = pathpoint.type;
-    if (ifdupe != null) {
-        newerarr.push(pathpoint.position.toString().split(','), pathpoint.position.toString().split(','));
-    } else {
-        newerarr.push(pathpoint.position.toString().split(','));
-    }
-});
-newerarr.shift();
-// console.log(finalObj.path.controlPoints);
-// console.log(newerarr);
-
-newerarr.forEach((ele) => parsedMat.addColumn(ele));
-parsedMat.addColumnVector(finalObj.startPosition.toString().split(',').map(Number))
 
 //pane
 const pane = new Pane({
@@ -59,8 +25,11 @@ const pane = new Pane({
 const PARAMS = {
     welcome:'Welcome to radial-designer! Import your .osu slider code,\nor choose from a preset to get started',
     size: 50, copies: 3, rotate_single: 0, rotate_all: 0, dist: -50, center: true,
-    importType: 'line', importObj: '', export: ''
 };
+const IO = {
+    importType: 'line', export: ''
+}
+
 pane.addBinding(PARAMS, 'welcome', {
     readonly: true, multiline: true, rows: 2, label: null,
 });
@@ -76,35 +45,71 @@ pane.addBinding(PARAMS, 'welcome', {
 })(pane.addFolder({
     title: 'parameters',
 }));
+let file;
+let textofFile;
 ((folder) => {
-    folder.addBinding(PARAMS, 'importType', {
+    folder.addBinding(IO, 'importType', {
         options: {
             line: 'line',
             curve: 'curve',
-            choose: 'choose',
+            imported: 'imported',
         }, label: 'import presets',
     })
-    folder.addBinding(PARAMS, 'importObj', {
-        label: 'import paste'
-    })
-    folder.addBinding(PARAMS, 'export', {
-        readonly: true, multiline: true, rows: 8, label: null
+    folder.addButton({
+        title: 'import .osu file',
+    }).on('click', () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.style.opacity = '0';
+        input.style.position = 'fixed';
+        document.body.appendChild(input);
+        input.addEventListener('input', () => {
+            file = input.files[0];
+            document.body.removeChild(input);
+            file.text().then(result => {
+                textofFile = result;
+                const beatmap1 = new BeatmapDecoder().decodeFromString(textofFile, true);
+                const finalObj = beatmap1.hitObjects[beatmap1.hitObjects.length - 1];
+
+                const parsedMatCopy = new Matrix([
+                    [],
+                    [],
+                ]);
+                const newerarr = [];
+                finalObj.path.controlPoints.forEach(pathpoint => {
+                    const ifdupe = pathpoint.type;
+                    if (ifdupe != null) {
+                        newerarr.push(pathpoint.position.toString().split(','), pathpoint.position.toString().split(','));
+                    } else {
+                        newerarr.push(pathpoint.position.toString().split(','));
+                    }
+                });
+                newerarr.shift();
+                newerarr.forEach((ele) => parsedMatCopy.addColumn(ele));
+                parsedMatCopy.addColumnVector(finalObj.startPosition.toString().split(',').map(Number))
+                parsedMat = parsedMatCopy.clone();
+            })
+        }, {once: true})
+        input.click();
     });
     folder.addButton({
-        title: 'capture image',
+        title: 'export pattern to .osu file',
+    }).on('click',()=>{
+
     })
+    folder.addBinding(IO, 'export', {
+        readonly: true, multiline: true, rows: 8, label: null
+    });
+
 
 })(pane.addFolder({
     title: 'import/export',
 }));
 //----------------------------------------------------------------------------------------------------------------------
-let input;
-function handleFile(){}
+
 window.setup = () => {
     createCanvas(windowWidth, windowHeight);
     fill("rgba(0, 0, 0, 0)")
-    // input = createFileInput(handleFile);
-    // input.position(0, 0);
     rectMode(CENTER);
     strokeCap(ROUND);
     strokeJoin(ROUND);
@@ -120,8 +125,17 @@ window.draw = () => {
     //translate(256, 192);
     const rotateAll = new Matrix([[Math.cos(degToRad(PARAMS.rotate_all)), -Math.sin(degToRad(PARAMS.rotate_all))], [Math.sin(degToRad(PARAMS.rotate_all)), Math.cos(degToRad(PARAMS.rotate_all))],]);
     const rotateSingle = new Matrix([[Math.cos(degToRad(PARAMS.rotate_single)), -Math.sin(degToRad(PARAMS.rotate_single))], [Math.sin(degToRad(PARAMS.rotate_single)), Math.cos(degToRad(PARAMS.rotate_single))],]);
-
-    let newmatrix = parsedMat.clone(); //what is newmatrix??
+    let newmatrix;
+    switch (IO.importType) {
+        case "line":
+             newmatrix = straight.clone();
+             break;
+        case "curve":
+             newmatrix = quadCurve.clone();
+             break;
+        case "imported":
+            newmatrix = parsedMat.clone();
+    }
     const tempcol = newmatrix.getColumn(0);
     const tempmat = new Matrix([[0 - tempcol[0]], [0 - tempcol[1]]]);
     for (let i = 0; i < newmatrix.columns - 1; i++) {
@@ -160,17 +174,11 @@ window.draw = () => {
         strokeWeight(PARAMS.size-5);
         circle(headparams[0], headparams[1], 1)
         pop();
-
-
-        //PARAMS.export = PARAMS.export +'\n'+ JSON.stringify(otherMatrices.to1DArray());
-        //console.log(JSON.stringify(otherMatrices.to1DArray()));
     }
     //PARAMS.export = newmatrix.to1DArray() + '\n' + 'hello';
     allMatArr.forEach((element)=> element.sub(tempmat))
     const arraymap = allMatArr.map((x) => x.to1DArray());
-    const stringtest = arraymap.join('\n');
-    PARAMS.export = stringtest;
-
+    PARAMS.export = arraymap.join('\n');
 };
 //----------------------------------------------------------------------------------------------------------------------
 function drawCurveSingleMatrix(matrix) {
