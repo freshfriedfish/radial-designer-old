@@ -9,7 +9,6 @@ const emptyMat = new Matrix([
     [],
 ]);
 // console.log(finalObj.path);
-
 const newerarr = [];
 finalObj.path.controlPoints.forEach(pathpoint => {
     const ifdupe = pathpoint.type;

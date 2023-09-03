@@ -27,14 +27,10 @@ const arcTest = new Matrix([
     [216,210,198,180,163,142,122,101,82,67,53,43 ,41 ,39 ,45 ,56 ,67 ,85 ,104,124,146,165,184,200,209],
 ])
 
-/*
-TODO:
-    - add .osu parsing
- */
 //file decoding
 const beatmap1 = new BeatmapDecoder().decodeFromString(textfile, true);
 const finalObj = beatmap1.hitObjects[beatmap1.hitObjects.length - 1];
-const emptyMat = new Matrix([
+const parsedMat = new Matrix([
     [],
     [],
 ]);
@@ -52,20 +48,19 @@ newerarr.shift();
 // console.log(finalObj.path.controlPoints);
 // console.log(newerarr);
 
-newerarr.forEach((ele) => emptyMat.addColumn(ele));
-emptyMat.addColumnVector(finalObj.startPosition.toString().split(',').map(Number))
+newerarr.forEach((ele) => parsedMat.addColumn(ele));
+parsedMat.addColumnVector(finalObj.startPosition.toString().split(',').map(Number))
 
 //pane
 const pane = new Pane({
-    title: 'radial-designer', expanded: false,
+    title: 'radial-designer', expanded: true,
 });
 
 const PARAMS = {
     welcome:'Welcome to radial-designer! Import your .osu slider code,\nor choose from a preset to get started',
     size: 50, copies: 3, rotate_single: 0, rotate_all: 0, dist: -50, center: true,
-    importType: '', importObj: '', export: ''
+    importType: 'line', importObj: '', export: ''
 };
-
 pane.addBinding(PARAMS, 'welcome', {
     readonly: true, multiline: true, rows: 2, label: null,
 });
@@ -84,9 +79,9 @@ pane.addBinding(PARAMS, 'welcome', {
 ((folder) => {
     folder.addBinding(PARAMS, 'importType', {
         options: {
-            choose: 'CHOOSE',
-            straight: 'STRAIGHT',
-            curve: 'CURVE',
+            line: 'line',
+            curve: 'curve',
+            choose: 'choose',
         }, label: 'import presets',
     })
     folder.addBinding(PARAMS, 'importObj', {
@@ -103,14 +98,19 @@ pane.addBinding(PARAMS, 'welcome', {
     title: 'import/export',
 }));
 //----------------------------------------------------------------------------------------------------------------------
+let input;
+function handleFile(){}
 window.setup = () => {
     createCanvas(windowWidth, windowHeight);
     fill("rgba(0, 0, 0, 0)")
+    // input = createFileInput(handleFile);
+    // input.position(0, 0);
     rectMode(CENTER);
     strokeCap(ROUND);
     strokeJoin(ROUND);
 };
 window.draw = () => {
+
     translate(width / 2, height / 2);
     //background('#0a538f');
     background(100);
@@ -121,7 +121,7 @@ window.draw = () => {
     const rotateAll = new Matrix([[Math.cos(degToRad(PARAMS.rotate_all)), -Math.sin(degToRad(PARAMS.rotate_all))], [Math.sin(degToRad(PARAMS.rotate_all)), Math.cos(degToRad(PARAMS.rotate_all))],]);
     const rotateSingle = new Matrix([[Math.cos(degToRad(PARAMS.rotate_single)), -Math.sin(degToRad(PARAMS.rotate_single))], [Math.sin(degToRad(PARAMS.rotate_single)), Math.cos(degToRad(PARAMS.rotate_single))],]);
 
-    let newmatrix = emptyMat.clone(); //what is newmatrix??
+    let newmatrix = parsedMat.clone(); //what is newmatrix??
     const tempcol = newmatrix.getColumn(0);
     const tempmat = new Matrix([[0 - tempcol[0]], [0 - tempcol[1]]]);
     for (let i = 0; i < newmatrix.columns - 1; i++) {
