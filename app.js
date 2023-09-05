@@ -216,12 +216,19 @@ function drawCurveSingleMatrix(matrix) {
                 vertex(marr[0][1], marr[1][1]);
                 break;
             case 3:
-                vertex(marr[0][0], marr[1][0]);
-                quadraticVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2],)
+                if (grouped.length === 1) {
+                    //arc code
+                } else {
+                    vertex(marr[0][0], marr[1][0]);
+                    quadraticVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2],)
+                }
                 break;
             case 4:
                 vertex(marr[0][0], marr[1][0]);
                 bezierVertex(marr[0][1], marr[1][1], marr[0][2], marr[1][2], marr[0][3], marr[1][3],)
+                break;
+            default:
+                //n-th order bezier 
         }
         //rect(marr[0][0], marr[1][0], 10);
     }
